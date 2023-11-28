@@ -237,16 +237,17 @@ def slack_parser(path_channel):
     combined = []
     for json_file in glob.glob(f"{path_channel}*.json"):
         with open(json_file, 'r', encoding="utf8") as slack_data:
-            combined.append(slack_data)
+            json_data = json.load(slack_data)
+            combined.append(json_data)
 
     # loop through all json files and extract required informations
     dflist = []
-    for slack_data in combined:
+    for day in combined:
 
         msg_type, msg_content, sender_id, time_msg, msg_dist, time_thread_st, reply_users, \
         reply_count, reply_users_count, tm_thread_end = [],[],[],[],[],[],[],[],[],[]
 
-        for row in slack_data:
+        for row in day:
             if 'bot_id' in row.keys():
                 continue
             else:
