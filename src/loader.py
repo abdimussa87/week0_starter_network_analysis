@@ -59,7 +59,7 @@ class SlackDataLoader:
         '''
         write a function to get all the messages from a channel
         '''
-
+  
         with open(os.path.join(self.path, channel_name), 'r') as f:
             channel_messages = json.load(f)
 
