@@ -289,7 +289,7 @@ def slack_parser(path_channel):
     return dfall
 
 
-def parse_slack_reaction(path, channel):
+def parse_slack_reaction(path, channel='Random'):
     """get reactions"""
     dfall_reaction = pd.DataFrame()
     combined = []
