@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 class DBWithSchema:
     def __init__(self) -> None:
-        self.client = MongoClient(os.getenv('DB_URL'))
+        self.client = MongoClient(os.environ["DB_URL"])
         self.db = self.client["slack_database"]
 
         self.channels_validator = {
