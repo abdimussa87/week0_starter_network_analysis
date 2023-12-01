@@ -1,4 +1,3 @@
-import os, sys
 import streamlit as st
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -6,14 +5,8 @@ import seaborn as sns
 from nltk.corpus import stopwords
 from wordcloud import WordCloud
 
-# Add parent directory to path to import modules from src
-rpath = os.path.abspath('..')
-if rpath not in sys.path:
-    sys.path.insert(0, rpath)
-import pprint
 
-from src.loader import SlackDataLoader
-import src.utils as utils
+import pprint
 import src.db_utils as db_utils
 import nltk
 nltk.download('punkt')
@@ -23,10 +16,7 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 
 
 # Initialize DataLoader
-data_loader = SlackDataLoader("../anonymized")
-all_week_1_path = os.path.join("../anonymized", 'all-week1/')
-week1_df = data_loader.slack_parser(all_week_1_path)
-week1_reactions_df = data_loader.parse_slack_reaction(all_week_1_path)
+
 
 db = db_utils.DBWithSchema()
 channel_messages =  db.find_all('channel_messages_test')
@@ -36,7 +26,8 @@ for channel in channel_messages:
     channel['_id']=str(channel.get('_id'))
     channel_messages_cleaned.append(channel)
 
-
+week1_df = pd.DataFrame(channel_messages_cleaned)
+pprint.pprint(week1_df.head())
 
 def get_top_20_message_senders(data, channel='Random'):
     """get user with the highest number of message sent to any channel"""
@@ -153,15 +144,15 @@ with st.container():
 
     users_with_the_most_reply_count(week1_df, 'all-week-1')
 
-st.write('---')
+# st.write('---')
 
-with st.container():
-    st.subheader('Users with the most reactions')
-    st.write(f'Users with the most reactions in #all-week-1 channel')
+# with st.container():
+#     st.subheader('Users with the most reactions')
+#     st.write(f'Users with the most reactions in #all-week-1 channel')
 
-    users_with_the_most_reactions(week1_reactions_df, 'all-week-1')
+#     users_with_the_most_reactions(week1_reactions_df, 'all-week-1')
 
-st.write('---')
+# st.write('---')
 
 with st.container():
     st.subheader('Sentiment Analysis')
