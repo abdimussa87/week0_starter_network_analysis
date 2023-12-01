@@ -26,6 +26,7 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 data_loader = SlackDataLoader("../anonymized")
 all_week_1_path = os.path.join("../anonymized", 'all-week1/')
 week1_df = data_loader.slack_parser(all_week_1_path)
+week1_reactions_df = data_loader.parse_slack_reaction(all_week_1_path)
 
 db = db_utils.DBWithSchema()
 channel_messages =  db.find_all('channel_messages_test')
@@ -58,6 +59,13 @@ def users_with_the_most_reply_count(data, channel='Random'):
    users_with_the_most_reply_count.columns = ['sender_name', 'reply_count']
 
    st.bar_chart(users_with_the_most_reply_count, x='sender_name', y='reply_count', use_container_width=True)
+
+def users_with_the_most_reactions(data, channel='Random'):
+    users_with_the_most_reactions = data.groupby('user_id')['reaction_count'].sum()\
+    .sort_values(ascending=False)[:10].to_frame(name='count').reset_index()
+    users_with_the_most_reactions.columns = ['user_id', 'reaction_count']
+
+    st.bar_chart(users_with_the_most_reactions, x='user_id', y='reaction_count', use_container_width=True)
 
 def show_sentiment_analysis():
     sia = SentimentIntensityAnalyzer()
@@ -144,6 +152,14 @@ with st.container():
     st.write(f'Users with the most reply count in #all-week-1 channel')
 
     users_with_the_most_reply_count(week1_df, 'all-week-1')
+
+st.write('---')
+
+with st.container():
+    st.subheader('Users with the most reactions')
+    st.write(f'Users with the most reactions in #all-week-1 channel')
+
+    users_with_the_most_reactions(week1_reactions_df, 'all-week-1')
 
 st.write('---')
 
