@@ -1,8 +1,11 @@
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 class DBWithSchema:
     def __init__(self) -> None:
-        self.client = MongoClient("mongodb://localhost:27017/")
+        self.client = MongoClient(os.environ["DB_URL"])
         self.db = self.client["slack_database"]
 
         self.channels_validator = {
@@ -199,6 +202,7 @@ class DBWithSchema:
             self.db.create_collection("users")
             self.db.create_collection("channel_messages")
             self.db.create_collection("channel_messages_test")
+            self.db.create_collection("channel_messages_reactions")
         except Exception as e:
             print(e)
 
