@@ -50,6 +50,12 @@ def get_bottom_20_message_senders(data, channel='Random'):
     st.write(f'Bottom 20 Message Senders in #{channel} channel', size=15, fontweight='bold')
     st.bar_chart(bottom_20_senders, x='sender_name', y='message_count', use_container_width=True)
 
+def users_with_the_most_reply_count(data, channel='Random'):
+   users_with_the_most_reply_count = data.groupby('sender_name')['reply_count'].mean().sort_values(ascending=False)[:20].to_frame(name='count').reset_index()
+   users_with_the_most_reply_count.columns = ['sender_name', 'reply_count']
+
+   st.bar_chart(users_with_the_most_reply_count, x='sender_name', y='reply_count', use_container_width=True)
+
 def show_sentiment_analysis():
     sia = SentimentIntensityAnalyzer()
     # run the polarity test on the dataset
@@ -68,7 +74,6 @@ def show_sentiment_analysis():
 
 
 
-
 st.set_page_config(
     page_title="10Academy Slack Dashboard",
     page_icon=":robot:",
@@ -76,14 +81,16 @@ st.set_page_config(
 )
 
 
-st.subheader('Dashboard')
+st.header('Dashboard')
 
 # All Week 1 Section
 with st.container():
     st.write('---')
-    st.title('All week 1 Channel')
+    st.subheader('All week 1 Channel')
     st.write("This is the data loaded for the 'all-week-1' channel slack messages")
     st.dataframe(channel_messages_cleaned)
+
+
 
 st.write('---')
 col_1 , col_2 = st.columns(2)
@@ -98,6 +105,14 @@ with col_2:
 st.write('---')
 
 with st.container():
-    st.title('Sentiment Analysis')
+    st.subheader('Users with the most reply count')
+    st.write(f'Users with the most reply count in #all-week-1 channel', size=15, fontweight='bold')
+
+    users_with_the_most_reply_count(week1_df, 'all-week-1')
+
+st.write('---')
+
+with st.container():
+    st.subheader('Sentiment Analysis')
     st.write('This is the sentiment analysis of the messages in the "all-week-1" channel with the help of nltk library')
     show_sentiment_analysis()
