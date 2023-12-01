@@ -3,6 +3,9 @@ import streamlit as st
 import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
+from nltk.corpus import stopwords
+from wordcloud import WordCloud
+
 # Add parent directory to path to import modules from src
 rpath = os.path.abspath('..')
 if rpath not in sys.path:
@@ -39,7 +42,7 @@ def get_top_20_message_senders(data, channel='Random'):
 
     top_20_senders = data['sender_name'].value_counts()[:20].to_frame(name='count').reset_index()
     top_20_senders.columns = ['sender_name', 'message_count']
-    st.write(f'Top 20 Message Senders in #{channel} channel', size=15, fontweight='bold')
+    st.write(f'Top 20 Message Senders in #{channel} channel')
     st.bar_chart(top_20_senders, x='sender_name', y='message_count', use_container_width=True)
 
 def get_bottom_20_message_senders(data, channel='Random'):
@@ -47,7 +50,7 @@ def get_bottom_20_message_senders(data, channel='Random'):
 
     bottom_20_senders = data['sender_name'].value_counts()[-20:].to_frame(name='count').reset_index()
     bottom_20_senders.columns = ['sender_name', 'message_count']
-    st.write(f'Bottom 20 Message Senders in #{channel} channel', size=15, fontweight='bold')
+    st.write(f'Bottom 20 Message Senders in #{channel} channel')
     st.bar_chart(bottom_20_senders, x='sender_name', y='message_count', use_container_width=True)
 
 def users_with_the_most_reply_count(data, channel='Random'):
@@ -72,6 +75,33 @@ def show_sentiment_analysis():
     vaders = vaders.merge(week1_df, how='right')
     st.write(vaders.head())
 
+def show_wordcloud(msg_content, week):    
+   # word cloud visualization
+    all_words = ' '.join([message for message in msg_content])
+    word_cloud = WordCloud(
+        background_color="#975429",
+        width=300,
+        height=200,
+        random_state=21,
+        max_words=500,
+        mode="RGBA",
+        max_font_size=140,
+        stopwords=stopwords.words("english"),
+    ).generate(all_words)
+
+    # Create a new figure explicitly
+    fig, ax = plt.subplots(figsize=(15, 7.5))
+
+    # Add the wordcloud to the figure
+    ax.imshow(word_cloud, interpolation="bilinear")
+    ax.axis("off")
+
+    # Add a title to the figure
+    ax.set_title(f"WordCloud for {week}", fontsize=30)
+
+    # Display the figure using Streamlit
+    st.pyplot(fig)
+
 
 
 st.set_page_config(
@@ -90,7 +120,12 @@ with st.container():
     st.write("This is the data loaded for the 'all-week-1' channel slack messages")
     st.dataframe(channel_messages_cleaned)
 
+st.write('---')
 
+with st.container():
+    st.subheader('Word Cloud')
+    st.write('This is the word cloud of the messages in the "all-week-1" channel')
+    show_wordcloud(week1_df['msg_content'], 'all-week-1')
 
 st.write('---')
 col_1 , col_2 = st.columns(2)
@@ -106,7 +141,7 @@ st.write('---')
 
 with st.container():
     st.subheader('Users with the most reply count')
-    st.write(f'Users with the most reply count in #all-week-1 channel', size=15, fontweight='bold')
+    st.write(f'Users with the most reply count in #all-week-1 channel')
 
     users_with_the_most_reply_count(week1_df, 'all-week-1')
 
