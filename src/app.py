@@ -11,6 +11,7 @@ import db_utils
 import nltk
 nltk.download('punkt')
 nltk.download('vader_lexicon')
+nltk.download('stopwords')
 
 from nltk.sentiment import SentimentIntensityAnalyzer
 
