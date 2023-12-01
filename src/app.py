@@ -26,7 +26,15 @@ for channel in channel_messages:
     channel['_id']=str(channel.get('_id'))
     channel_messages_cleaned.append(channel)
 
+channel_messages_reactions =  db.find_all('channel_messages_reactions')
+channel_messages_reactions_cleaned = []
+
+for reaction in channel_messages_reactions:
+    reaction['_id']=str(reaction.get('_id'))
+    channel_messages_reactions_cleaned.append(reaction)
+
 week1_df = pd.DataFrame(channel_messages_cleaned)
+week1_reactions_df = pd.DataFrame(channel_messages_reactions_cleaned)
 pprint.pprint(week1_df.head())
 
 def get_top_20_message_senders(data, channel='Random'):
@@ -144,15 +152,15 @@ with st.container():
 
     users_with_the_most_reply_count(week1_df, 'all-week-1')
 
-# st.write('---')
+st.write('---')
 
-# with st.container():
-#     st.subheader('Users with the most reactions')
-#     st.write(f'Users with the most reactions in #all-week-1 channel')
+with st.container():
+    st.subheader('Users with the most reactions')
+    st.write(f'Users with the most reactions in #all-week-1 channel')
 
-#     users_with_the_most_reactions(week1_reactions_df, 'all-week-1')
+    users_with_the_most_reactions(week1_reactions_df, 'all-week-1')
 
-# st.write('---')
+st.write('---')
 
 with st.container():
     st.subheader('Sentiment Analysis')
