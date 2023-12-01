@@ -12,6 +12,12 @@ import pprint
 from src.loader import SlackDataLoader
 import src.utils as utils
 import src.db_utils as db_utils
+import nltk
+nltk.download('punkt')
+nltk.download('vader_lexicon')
+
+from nltk.sentiment import SentimentIntensityAnalyzer
+
 
 # Initialize DataLoader
 data_loader = SlackDataLoader("../anonymized")
@@ -19,7 +25,7 @@ all_week_1_path = os.path.join("../anonymized", 'all-week1/')
 week1_df = data_loader.slack_parser(all_week_1_path)
 
 db = db_utils.DBWithSchema()
-channel_messages =  db.find_all('channel_messages')
+channel_messages =  db.find_all('channel_messages_test')
 channel_messages_cleaned=[]
 
 for channel in channel_messages:
@@ -43,6 +49,24 @@ def get_bottom_20_message_senders(data, channel='Random'):
     bottom_20_senders.columns = ['sender_name', 'message_count']
     st.write(f'Bottom 20 Message Senders in #{channel} channel', size=15, fontweight='bold')
     st.bar_chart(bottom_20_senders, x='sender_name', y='message_count', use_container_width=True)
+
+def show_sentiment_analysis():
+    sia = SentimentIntensityAnalyzer()
+    # run the polarity test on the dataset
+    results = {}
+    for i, row in week1_df.iterrows():
+        message_content = row['msg_content']
+        results[message_content] =sia.polarity_scores(message_content)
+    
+
+    # generate DataFrame that has been transposed
+    vaders = pd.DataFrame(results).T    
+    # renaming the index column so that we have a common column when merging
+    vaders = vaders.reset_index().rename(columns={'index': 'msg_content'})
+    vaders = vaders.merge(week1_df, how='right')
+    st.write(vaders.head())
+
+
 
 
 st.set_page_config(
@@ -70,3 +94,10 @@ with col_1:
 with col_2:
     st.subheader('Bottom 20 Message Senders')
     get_bottom_20_message_senders(week1_df, 'all-week-1')
+
+st.write('---')
+
+with st.container():
+    st.title('Sentiment Analysis')
+    st.write('This is the sentiment analysis of the messages in the "all-week-1" channel with the help of nltk library')
+    show_sentiment_analysis()
