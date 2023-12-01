@@ -198,6 +198,7 @@ class DBWithSchema:
             self.db.create_collection("channels")
             self.db.create_collection("users")
             self.db.create_collection("channel_messages")
+            self.db.create_collection("channel_messages_test")
         except Exception as e:
             print(e)
 
