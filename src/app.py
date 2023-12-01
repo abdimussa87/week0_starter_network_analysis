@@ -7,7 +7,7 @@ from wordcloud import WordCloud
 
 
 import pprint
-import src.db_utils as db_utils
+import db_utils
 import nltk
 nltk.download('punkt')
 nltk.download('vader_lexicon')
